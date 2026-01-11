@@ -1,0 +1,96 @@
+#!/usr/bin/bash
+
+debug(){
+	echo '[debug]' "$@" >&2 #STDERR
+}
+progress-bar(){
+	local current=$1
+	local total=$2
+	local length=$(("$COLUMNS"-7)) #[] and 100 and %
+
+	local perc_done=$((current * 100 / total))
+	local num_bars=$((perc_done * length / 100))
+	local s='['
+	local i=0
+
+	for(( i=0;i<num_bars;i++)); do
+		s+='|'
+	done
+
+	
+	for(( i=$num_bars;i<$length;i++)); do
+		s+='.'
+	done
+
+	s+="]$perc_done%"
+
+	
+	#Save Cursor Locn
+	printf '\e7'
+
+	#Move Cursor to bottom
+	printf '\e[%d;%dH' "$LINES" 0
+
+	#Clear the Line
+	printf '\e[0K'
+
+	#Print the progress
+	printf "%s" "$s">&2
+	
+	#Reset Cursor
+	printf '\e8'
+}
+init_term(){
+	#Ensure a line is there
+	printf '\n'
+
+	#Save cursor locn
+	printf '\e7'
+	
+	#set scrollable region --> syntax \e[(top);(bottom)r
+	printf '\e[%d;%dr' 0 "$((LINES-1))"
+	
+	#restore cursor location
+	printf '\e8'
+	
+	#undo new line
+	printf '\e[1A'
+}
+
+
+deinit_term(){
+	#SAVE CURSOR LOCN
+	printf '\e7'
+
+	#Reset scroll region
+	printf '\e[%d;%dr' 0 "$((LINES))"
+
+	#Move to bottom Line
+	printf '\e[%d;%dH' "$((LINES))" 0  #GO TO LAST LINE 0th position
+
+	#clear the line
+	printf '\e[0K'
+
+	#Reset the cursor Locn
+	printf '\e8'
+
+	#TO START FROM NEW LINE
+	printf '\n'
+}
+
+main(){
+
+	shopt -s checkwinsize
+	#TO ENSURE LINES AND COLUMNS ARE SET
+	(:)
+	
+	trap deinit_term exit
+	init_term
+	printf "I GOT THISS...!!!"
+	for((i=0;i<=500;i++));do
+		progress-bar "$i" 500
+		sleep 0.1
+	done
+}
+
+main

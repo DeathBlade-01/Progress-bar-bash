@@ -1,0 +1,52 @@
+#!/usr/bin/bash
+
+. ./lib/bmp || exit
+. ./lib/progress-bar-mod || exit
+
+debug(){
+	echo '[debug]' "$@">&2 ## OUT TO STDERR
+}
+make_bmp(){
+	local width=$1
+	local height=$2
+
+	bmp-header "$width" "$height"
+	local padding=$REPLY
+
+	#COLOUR DATA
+	local r g b x y
+	init_term
+	for ((y=0;y<height;y++));do
+		for((x=0;x<width;x++));do
+			((r=x*255/width))
+			((g=y*255/height))
+			bmp-rgb "$r" "$g" 0 
+		done
+		if ((y%10==0));then
+			debug "handled row $y/$height"
+		fi
+		progress-bar "$y" "$height"
+		bmp-pad "$padding"
+	done	
+	deinit_term 
+}
+main(){
+	local width=400
+	local height=400
+	local output=img.bmp
+	local OPTIND OPTARG opt
+	while getopts 'w:h:o:' opt; do
+		case "$opt" in
+			w) width=$OPTARG;;
+			h) height=$OPTARG;;
+			o) output=$OPTARG;;
+		esac
+	done
+	
+	make_bmp "$width" "$height" > "$output"
+		
+
+	echo -e "Generated ${width} x ${height} image.\nOutput File Name:${output}"
+}
+
+main "$@"
