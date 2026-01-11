@@ -148,7 +148,7 @@ term_cols=${term_size##* }
 
 This means the progress bar adapts if you resize your terminal mid-execution.
 
-## Complete Example
+## Quick Start
 
 ```bash
 #!/usr/bin/bash
@@ -175,6 +175,21 @@ process_files() {
 # Example usage
 process_files file1.txt file2.txt file3.txt file4.txt file5.txt
 ```
+
+## Try it immediately
+Want to see it in action right now? The library includes a demo script:
+
+# Clone and run the gradient demo
+
+```
+git clone https://github.com/yourusername/bash-progress-bar.git
+cd bash-progress-bar
+chmod +x gradient
+./gradient -w 400 -h 400 -o gradient.bmp
+```
+
+This generates a 400x400 gradient image while showing a live progress bar. Watch it work!
+
 
 **Output:**
 ```
